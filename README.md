@@ -14,6 +14,12 @@ A cool Spotify display to show me what I’m currently listening to and allow sk
 - [basic_display.ino](software/basic_display/basic_display.ino) -- Display-only logic (no functioning key switches); connects to WiFi and Spotify API and shows currently playing artist and track on the screen.
 - [local_ip.ino](software/local_ip/local_ip.ino) -- Debugging program that connects to WiFi and displays the microcontroller's loal IP address on the screen.
 
+## Wiring Diagram
+The KiCAD file for the schematic is available in the [schematic/](schematic/) directory.
+<br />
+
+<img width="822" height="870" alt="image" src="https://github.com/user-attachments/assets/f3b061fc-8aa2-46b5-a0dc-58486131a4d8" />
+
 ## Code - Getting Started
 1. Fill in the correct pin numbers at the top of the software files.
 2. Create a Spotify API application.

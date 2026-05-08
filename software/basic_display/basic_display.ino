@@ -1,0 +1,73 @@
+#include <Arduino.h>
+#include <ArduinoJson.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_ST7735.h>
+#include <WiFi.h>
+#include <SpotifyEsp32.h>
+#include <SPI.h>
+
+#define TFT_CS 5
+#define TFT_RST 3
+#define TFT_DC 4
+#define TFT_SCLK 6
+#define TFT_MOSI 10
+
+const char* SSID = "SSID";
+const char* PASSWORD = "PASSWORD";
+const char* CLIENT_ID = "CLIENT_ID";
+const char* CLIENT_SECRET = "CLIENT_SECRET";
+
+String lastArtist;
+String lastTrackname;
+String currentArtist;
+String currentTrackname;
+
+Spotify sp(CLIENT_ID, CLIENT_SECRET);
+Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_MOSI, TFT_SCLK, TFT_RST);
+
+void setup() {
+  Serial.begin(115200);
+
+  tft.initR(INITR_BLACKTAB);
+  tft.setRotation(1);
+  Serial.println("TFT initialized!");
+  tft.fillScreen(ST77XX_BLACK);
+
+  WiFi.begin(SSID, PASSWORD);
+  Serial.print("Connecting to WiFi...");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    Serial.print(".");
+  }
+  Serial.printf("\nConnected!\n");
+
+  tft.setCursor(0,0);
+  tft.write(WiFi.localIP().toString().c_str());
+
+  sp.begin();
+  while (!sp.is_auth()) {
+    sp.handle_client();
+  }
+  Serial.println("Connected to Spotify!");
+}
+
+void loop() {
+  currentArtist = sp.current_artist_names();
+  currentTrackname = sp.current_track_name();
+
+  if (lastArtist != currentArtist && currentArtist != "Something went wrong" && !currentArtist.isEmpty()) {
+    tft.fillScreen(ST77XX_BLACK);
+    lastArtist = currentArtist;
+    Serial.println("Artist: " + lastArtist);
+    tft.setCursor(10,10);
+    tft.write(lastArtist.c_str());
+  }
+
+  if (lastTrackname != currentTrackname && currentTrackname != "Something went wrong" && currentTrackname != "null") {
+    lastTrackname = currentTrackname;
+    Serial.println("Track: " + lastTrackname);
+    tft.setCursor(10,40);
+    tft.write(lastTrackname.c_str());
+  }
+  delay(2000);
+}
